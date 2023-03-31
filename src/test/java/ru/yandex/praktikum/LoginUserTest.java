@@ -13,11 +13,11 @@ import org.junit.Test;
 import ru.yandex.praktikum.client.LoginClient;
 import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
+import ru.yandex.praktikum.model.UserCredentials;
 import ru.yandex.praktikum.model.UserGenerator;
 
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class LoginUserTest {
     private UserClient userClient;
@@ -46,19 +46,56 @@ public class LoginUserTest {
     }
 
     @Test
-    @DisplayName("Создание пользователя с валидными данными")
+    @DisplayName("Успешный логин под созданным пользователем")
     public void loginWithExistedUserIsSuccessful(){
         User user = UserGenerator.getRandom();
 
         ValidatableResponse createResponse = userClient.create(user);
         accessToken = createResponse.extract().path("accessToken");
 
-        loginClient.login(accessToken)
+        loginClient.login(UserCredentials.from(user))
+        .assertThat()
+        .statusCode(SC_OK)
+        .and()
+        .assertThat()
+        .body("success", is(true))
+        .body("user.email", is(user.getEmail().toLowerCase()))
+        .body("user.name", is(user.getName()));
+    }
+
+    @Test
+    @DisplayName("Логин под созданным пользователем с неправильной почтой")
+    public void loginWithExistedUserWithInvalidEmailFailed(){
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+        user.setEmail("");
+
+        loginClient.login(UserCredentials.from(user))
                 .assertThat()
-                .statusCode(SC_OK)
+                .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .assertThat()
-                .body("accessToken", is(accessToken));
+                .body("success", is(false))
+                .body("message", is("email or password are incorrect"));
+    }
 
+    @Test
+    @DisplayName("Логин под созданным пользователем с неправильной почтой")
+    public void loginWithExistedUserWithInvalidPasswordIsFailed(){
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+        user.setPassword("");
+
+        loginClient.login(UserCredentials.from(user))
+                .assertThat()
+                .statusCode(SC_UNAUTHORIZED)
+                .and()
+                .assertThat()
+                .body("success", is(false))
+                .body("message", is("email or password are incorrect"));
     }
 }

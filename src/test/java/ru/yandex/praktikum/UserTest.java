@@ -14,13 +14,16 @@ import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
+import java.util.Base64;
+
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
-public class CreateUserTest {
+public class UserTest {
     private UserClient userClient;
     private String accessToken;
+    private String wrongAccessToken = Base64.getEncoder().encodeToString(("Wrong Token").getBytes());
 
     @BeforeClass
     public static void globalSetUp() {
@@ -76,7 +79,7 @@ public class CreateUserTest {
 
     @Test
     @DisplayName("Создание пользователя без почты")
-    public void courierCantBeCreatedWithoutEmail() {
+    public void userCantBeCreatedWithoutEmail() {
         User user = UserGenerator.getRandom();
         user.setEmail("");
 
@@ -92,7 +95,7 @@ public class CreateUserTest {
 
     @Test
     @DisplayName("Создание пользователя без пароля")
-    public void courierCantBeCreatedWithoutPassword() {
+    public void userCantBeCreatedWithoutPassword() {
         User user = UserGenerator.getRandom();
         user.setPassword("");
 
@@ -108,7 +111,7 @@ public class CreateUserTest {
 
     @Test
     @DisplayName("Создание пользователя без имени")
-    public void courierCantBeCreatedWithoutName() {
+    public void userCantBeCreatedWithoutName() {
         User user = UserGenerator.getRandom();
         user.setName("");
 
@@ -120,5 +123,81 @@ public class CreateUserTest {
                 .body("success", is(false))
                 .assertThat()
                 .body("message", is("Email, password and name are required fields"));
+    }
+
+    @Test
+    @DisplayName("Изменение почты пользователя")
+    public void userEmailChangedSuccessfully() {
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+
+        String newEmail = user.getEmail() + "n";
+
+        userClient.updateEmail(accessToken, newEmail)
+                .assertThat()
+                .statusCode(SC_OK)
+                .and()
+                .assertThat()
+                .body("success", is(true))
+                .body("user.email", is(newEmail.toLowerCase()));
+    }
+
+    @Test
+    @DisplayName("Изменение имени пользователя")
+    public void userNameChangedSuccessfully() {
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+
+        String newName = user.getName() + "New";
+
+        userClient.updateName(accessToken, newName)
+                .assertThat()
+                .statusCode(SC_OK)
+                .and()
+                .assertThat()
+                .body("success", is(true))
+                .body("user.name", is(newName));
+    }
+
+    @Test
+    @DisplayName("Изменение почты пользователя без авторизации")
+    public void userEmailChangeWithoutAuthorizationFailed() {
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+
+        String newEmail = user.getEmail() + "n";
+
+        userClient.updateEmailUnauthorized(newEmail)
+                .assertThat()
+                .statusCode(SC_UNAUTHORIZED)
+                .and()
+                .assertThat()
+                .body("success", is(false))
+                .body("message", is("You should be authorised"));
+    }
+
+    @Test
+    @DisplayName("Изменение почты пользователя без авторизации")
+    public void userNameChangeWithoutAuthorizationFailed() {
+        User user = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+
+        String newName = user.getName() + "New";
+
+        userClient.updateNameUnauthorized(newName)
+                .assertThat()
+                .statusCode(SC_UNAUTHORIZED)
+                .and()
+                .assertThat()
+                .body("success", is(false))
+                .body("message", is("You should be authorised"));
     }
 }
