@@ -34,47 +34,24 @@ public class UserClient extends StellarBurgerRestClient {
                 .then();
     }
 
-    @Step("Update email of user {user}")
-    public ValidatableResponse updateEmail(String accessToken, String newEmail) {
+    @Step("Update field of authorized user")
+    public ValidatableResponse updateFieldAuthorized(String accessToken, String fieldName, String fieldValue) {
         return given()
                 .spec(getBaseReqSpec())
                 .header("Authorization", accessToken)
                 .body("{\n" +
-                        "  \"email\": \"" + newEmail +"\" \n}")
+                        "  \"" + fieldName + "\": \"" + fieldValue +"\" \n}")
                 .when()
                 .patch(USER_BASE_URI)
                 .then();
     }
 
-    @Step("Update email of user {user}")
-    public ValidatableResponse updateEmailUnauthorized(String newEmail) {
+    @Step("Update field of unauthorized user")
+    public ValidatableResponse updateFieldUnauthorized(String fieldName, String fieldValue) {
         return given()
                 .spec(getBaseReqSpec())
                 .body("{\n" +
-                        "  \"email\": \"" + newEmail +"\" \n}")
-                .when()
-                .patch(USER_BASE_URI)
-                .then();
-    }
-
-    @Step("Update email of user {user}")
-    public ValidatableResponse updateName(String accessToken, String newName) {
-        return given()
-                .spec(getBaseReqSpec())
-                .header("Authorization", accessToken)
-                .body("{\n" +
-                        "  \"name\": \"" + newName +"\" \n}")
-                .when()
-                .patch(USER_BASE_URI)
-                .then();
-    }
-
-    @Step("Update email of user {user}")
-    public ValidatableResponse updateNameUnauthorized(String newName) {
-        return given()
-                .spec(getBaseReqSpec())
-                .body("{\n" +
-                        "  \"name\": \"" + newName +"\" \n}")
+                        "  \"" + fieldName + "\": \"" + fieldValue +"\" \n}")
                 .when()
                 .patch(USER_BASE_URI)
                 .then();

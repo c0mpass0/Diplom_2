@@ -135,7 +135,7 @@ public class UserTest {
 
         String newEmail = user.getEmail() + "n";
 
-        userClient.updateEmail(accessToken, newEmail)
+        userClient.updateFieldAuthorized(accessToken,"email", newEmail)
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
@@ -154,7 +154,7 @@ public class UserTest {
 
         String newName = user.getName() + "New";
 
-        userClient.updateName(accessToken, newName)
+        userClient.updateFieldAuthorized(accessToken, "name", newName)
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
@@ -173,7 +173,7 @@ public class UserTest {
 
         String newEmail = user.getEmail() + "n";
 
-        userClient.updateEmailUnauthorized(newEmail)
+        userClient.updateFieldUnauthorized("email", newEmail)
                 .assertThat()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
@@ -192,12 +192,35 @@ public class UserTest {
 
         String newName = user.getName() + "New";
 
-        userClient.updateNameUnauthorized(newName)
+        userClient.updateFieldUnauthorized("name", newName)
                 .assertThat()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .assertThat()
                 .body("success", is(false))
                 .body("message", is("You should be authorised"));
+    }
+
+    @Test
+    @DisplayName("Изменение имени пользователя")
+    public void userEmailChangeToUsedFailed() {
+        User user = UserGenerator.getRandom();
+        User user2 = UserGenerator.getRandom();
+
+        ValidatableResponse createResponse = userClient.create(user);
+        accessToken = createResponse.extract().path("accessToken");
+        ValidatableResponse createResponse2 = userClient.create(user2);
+        String accessToken2 = createResponse2.extract().path("accessToken");
+
+        ValidatableResponse emailUpdateResponce = userClient.updateFieldAuthorized(accessToken, "email", user2.getEmail());
+        userClient.delete(accessToken2);
+
+        emailUpdateResponce
+                .assertThat()
+                .statusCode(SC_FORBIDDEN)
+                .and()
+                .assertThat()
+                .body("success", is(false))
+                .body("message", is("User with such email already exists"));
     }
 }
