@@ -14,8 +14,6 @@ import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
-import java.util.Base64;
-
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,7 +21,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 public class UserTest {
     private UserClient userClient;
     private String accessToken;
-    private String wrongAccessToken = Base64.getEncoder().encodeToString(("Wrong Token").getBytes());
 
     @BeforeClass
     public static void globalSetUp() {
