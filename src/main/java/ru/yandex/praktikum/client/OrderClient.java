@@ -21,4 +21,33 @@ public class OrderClient extends StellarBurgerRestClient {
                 .post(ORDER_BASE_URL)
                 .then();
     }
+
+    @Step("Create order")
+    public ValidatableResponse createOrderUnauthorized(Order order){
+        return given()
+                .spec(getBaseReqSpec())
+                .body(order)
+                .when()
+                .post(ORDER_BASE_URL)
+                .then();
+    }
+
+    @Step("Get orders of user")
+    public ValidatableResponse getOrdersOfUser(String accessToken){
+        return given()
+                .spec(getBaseReqSpec())
+                .header("Authorization", accessToken)
+                .when()
+                .get(ORDER_BASE_URL)
+                .then();
+    }
+
+    @Step("Get orders of user")
+    public ValidatableResponse getUnauthorisedOrdersOfUser(){
+        return given()
+                .spec(getBaseReqSpec())
+                .when()
+                .get(ORDER_BASE_URL)
+                .then();
+    }
 }
