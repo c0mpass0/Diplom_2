@@ -5,8 +5,6 @@ import io.restassured.response.ValidatableResponse;
 import ru.yandex.praktikum.client.base.StellarBurgerRestClient;
 import ru.yandex.praktikum.model.User;
 
-import java.util.Base64;
-
 import static io.restassured.RestAssured.given;
 public class UserClient extends StellarBurgerRestClient {
 

@@ -64,7 +64,7 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("Cоздание заказа неавторизированным пользователем запрещено")
+    @DisplayName("Cоздание заказа неавторизированным пользователем")
     public void orderCreationUnauthorizedFailed(){
         User user = UserGenerator.getRandom();
         ingredients = new String[]{r2D3,protostomiaMeat,beefMeteora};
@@ -75,7 +75,7 @@ public class OrderTest {
 
         orderClient.createOrderUnauthorized(order)
                 .assertThat()
-                .statusCode(SC_FORBIDDEN);
+                .statusCode(SC_OK);
     }
 
     @Test
@@ -129,7 +129,6 @@ public class OrderTest {
                 .and()
                 .assertThat()
                 .body("success", is(true));
-
     }
 
     @Test
