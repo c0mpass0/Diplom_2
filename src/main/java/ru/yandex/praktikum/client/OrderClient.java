@@ -7,6 +7,7 @@ import ru.yandex.praktikum.client.base.StellarBurgerRestClient;
 import ru.yandex.praktikum.model.Order;
 
 import java.util.List;
+import java.util.Random;
 
 import static io.restassured.RestAssured.given;
 
@@ -14,6 +15,7 @@ public class OrderClient extends StellarBurgerRestClient {
 
     private static final String ORDER_BASE_URL = BASE_URI + "orders";
     private static final String INGREDIENT_BASE_URL = BASE_URI + "ingredients";
+    Random rand = new Random();
     @Step("Create order")
     public ValidatableResponse createOrder(String accessToken, Order order){
         return given()
@@ -55,14 +57,17 @@ public class OrderClient extends StellarBurgerRestClient {
     }
 
     @Step("get ingredients list")
-    public List<String> getIngredients(){
+    public String[] getIngredients(int count){
         Response ingredients = given()
                 .spec(getBaseReqSpec())
                 .when()
                 .get(INGREDIENT_BASE_URL);
 
-        List<String> e = ingredients.getBody().jsonPath().getList("data._id");
-        System.out.println(e);
-        return e;
+        List<String> ingredientsList = ingredients.getBody().jsonPath().getList("data._id");
+        String[] ingredientsOutput = new String[count];
+        for(int i = 0; i < ingredientsOutput.length; i++){
+            ingredientsOutput[i] = ingredientsList.get(rand.nextInt(ingredientsList.size()));
+        }
+        return ingredientsOutput;
     }
 }

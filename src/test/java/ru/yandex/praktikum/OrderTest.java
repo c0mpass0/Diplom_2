@@ -16,9 +16,6 @@ import ru.yandex.praktikum.model.Order;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
-import java.util.List;
-import java.util.Random;
-
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
 import static ru.yandex.praktikum.resources.Ingredients.*;
@@ -28,7 +25,6 @@ public class OrderTest {
     private OrderClient orderClient;
     private String accessToken;
     private String[] ingredients;
-    Random rand = new Random();
 
     @BeforeClass
     public static void globalSetUp() {
@@ -55,10 +51,7 @@ public class OrderTest {
     @DisplayName("Успешное создание заказа")
     public void orderSuccessfulCreation() {
         User user = UserGenerator.getRandom();
-        List<String> ingredientsList = orderClient.getIngredients();
-        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
+        ingredients = orderClient.getIngredients(3);
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -73,10 +66,7 @@ public class OrderTest {
     @DisplayName("Cоздание заказа неавторизированным пользователем")
     public void orderCreationUnauthorizedFailed() {
         User user = UserGenerator.getRandom();
-        List<String> ingredientsList = orderClient.getIngredients();
-        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
+        ingredients = orderClient.getIngredients(3);
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -125,10 +115,7 @@ public class OrderTest {
     @DisplayName("Получение информации о созданном заказе для авторизированного пользователя")
     public void getOrdersOfUser() {
         User user = UserGenerator.getRandom();
-        List<String> ingredientsList = orderClient.getIngredients();
-        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
+        ingredients = orderClient.getIngredients(2);
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -147,10 +134,7 @@ public class OrderTest {
     @DisplayName("Получение информации о созданном заказе для авторизированного пользователя")
     public void getUnauthorisedOrdersOfUser() {
         User user = UserGenerator.getRandom();
-        List<String> ingredientsList = orderClient.getIngredients();
-        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
-                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
+        ingredients = orderClient.getIngredients(4);
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
