@@ -1,13 +1,14 @@
 package ru.yandex.praktikum.model;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import com.github.javafaker.Faker;
 
 public class UserGenerator {
 
     public static User getRandom() {
-        String email = RandomStringUtils.randomAlphabetic(10) + "@" + RandomStringUtils.randomAlphabetic(4) + "." + RandomStringUtils.randomAlphabetic(2);
-        String password = RandomStringUtils.randomAlphabetic(10);
-        String name = RandomStringUtils.randomAlphabetic(10);
+        Faker faker = new Faker();
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password(6,10);
+        String name = faker.harryPotter().character();
         return new User(email, password, name);
     }
 }

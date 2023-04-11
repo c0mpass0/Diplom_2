@@ -4,6 +4,8 @@ import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import ru.yandex.praktikum.client.base.StellarBurgerRestClient;
 import ru.yandex.praktikum.model.User;
+import ru.yandex.praktikum.model.UserUpdateEmail;
+import ru.yandex.praktikum.model.UserUpdateName;
 
 import static io.restassured.RestAssured.given;
 public class UserClient extends StellarBurgerRestClient {
@@ -32,24 +34,41 @@ public class UserClient extends StellarBurgerRestClient {
                 .then();
     }
 
-    @Step("Update field of authorized user")
-    public ValidatableResponse updateFieldAuthorized(String accessToken, String fieldName, String fieldValue) {
+    @Step("Update email of authorized user")
+    public ValidatableResponse updateEmailAuthorized(String accessToken, UserUpdateEmail userUpdateEmail) {
         return given()
                 .spec(getBaseReqSpec())
                 .header("Authorization", accessToken)
-                .body("{\n" +
-                        "  \"" + fieldName + "\": \"" + fieldValue +"\" \n}")
+                .body(userUpdateEmail)
+                .when()
+                .patch(USER_BASE_URI)
+                .then();
+    }
+    @Step("Update name of authorized user")
+    public ValidatableResponse updateNameAuthorized(String accessToken, UserUpdateName userUpdateName) {
+        return given()
+                .spec(getBaseReqSpec())
+                .header("Authorization", accessToken)
+                .body(userUpdateName)
                 .when()
                 .patch(USER_BASE_URI)
                 .then();
     }
 
-    @Step("Update field of unauthorized user")
-    public ValidatableResponse updateFieldUnauthorized(String fieldName, String fieldValue) {
+    @Step("Update email of unauthorized user")
+    public ValidatableResponse updateEmailUnauthorized(UserUpdateEmail userUpdateEmail) {
         return given()
                 .spec(getBaseReqSpec())
-                .body("{\n" +
-                        "  \"" + fieldName + "\": \"" + fieldValue +"\" \n}")
+                .body(userUpdateEmail)
+                .when()
+                .patch(USER_BASE_URI)
+                .then();
+    }
+    @Step("Update name of unauthorized user")
+    public ValidatableResponse updateNameUnauthorized(UserUpdateName userUpdateEmail) {
+        return given()
+                .spec(getBaseReqSpec())
+                .body(userUpdateEmail)
                 .when()
                 .patch(USER_BASE_URI)
                 .then();

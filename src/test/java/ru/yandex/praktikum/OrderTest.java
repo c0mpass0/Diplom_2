@@ -16,6 +16,9 @@ import ru.yandex.praktikum.model.Order;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
 
+import java.util.List;
+import java.util.Random;
+
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
 import static ru.yandex.praktikum.resources.Ingredients.*;
@@ -24,8 +27,8 @@ public class OrderTest {
     private UserClient userClient;
     private OrderClient orderClient;
     private String accessToken;
-
     private String[] ingredients;
+    Random rand = new Random();
 
     @BeforeClass
     public static void globalSetUp() {
@@ -50,9 +53,12 @@ public class OrderTest {
 
     @Test
     @DisplayName("Успешное создание заказа")
-    public void orderSuccessfulCreation(){
+    public void orderSuccessfulCreation() {
         User user = UserGenerator.getRandom();
-        ingredients = new String[]{r2D3,protostomiaMeat,beefMeteora};
+        List<String> ingredientsList = orderClient.getIngredients();
+        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -65,9 +71,12 @@ public class OrderTest {
 
     @Test
     @DisplayName("Cоздание заказа неавторизированным пользователем")
-    public void orderCreationUnauthorizedFailed(){
+    public void orderCreationUnauthorizedFailed() {
         User user = UserGenerator.getRandom();
-        ingredients = new String[]{r2D3,protostomiaMeat,beefMeteora};
+        List<String> ingredientsList = orderClient.getIngredients();
+        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -80,7 +89,7 @@ public class OrderTest {
 
     @Test
     @DisplayName("Создание заказа без ингридиентов")
-    public void orderCreationWithoutIngredientsFailed(){
+    public void orderCreationWithoutIngredientsFailed() {
         User user = UserGenerator.getRandom();
         Order order = new Order(ingredients);
 
@@ -98,8 +107,8 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("Успешное создание заказа")
-    public void orderCreationWithNonExistentId(){
+    @DisplayName("Создание заказа с несуществующим ингридиентом")
+    public void orderCreationWithNonExistentId() {
         User user = UserGenerator.getRandom();
         ingredients = new String[]{ingredientNonExistedId};
         Order order = new Order(ingredients);
@@ -114,9 +123,12 @@ public class OrderTest {
 
     @Test
     @DisplayName("Получение информации о созданном заказе для авторизированного пользователя")
-    public void getOrdersOfUser(){
+    public void getOrdersOfUser() {
         User user = UserGenerator.getRandom();
-        ingredients = new String[]{r2D3,protostomiaMeat,beefMeteora};
+        List<String> ingredientsList = orderClient.getIngredients();
+        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);
@@ -133,9 +145,12 @@ public class OrderTest {
 
     @Test
     @DisplayName("Получение информации о созданном заказе для авторизированного пользователя")
-    public void getUnauthorisedOrdersOfUser(){
+    public void getUnauthorisedOrdersOfUser() {
         User user = UserGenerator.getRandom();
-        ingredients = new String[]{r2D3,protostomiaMeat,beefMeteora};
+        List<String> ingredientsList = orderClient.getIngredients();
+        ingredients = new String[]{ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))
+                , ingredientsList.get(rand.nextInt(ingredientsList.size()))};
         Order order = new Order(ingredients);
 
         ValidatableResponse createResponse = userClient.create(user);

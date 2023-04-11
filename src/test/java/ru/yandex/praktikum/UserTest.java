@@ -13,6 +13,8 @@ import org.junit.Test;
 import ru.yandex.praktikum.client.UserClient;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.UserGenerator;
+import ru.yandex.praktikum.model.UserUpdateEmail;
+import ru.yandex.praktikum.model.UserUpdateName;
 
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
@@ -131,8 +133,9 @@ public class UserTest {
         accessToken = createResponse.extract().path("accessToken");
 
         String newEmail = user.getEmail() + "n";
+        UserUpdateEmail userUpdateEmail = new UserUpdateEmail(newEmail);
 
-        userClient.updateFieldAuthorized(accessToken,"email", newEmail)
+        userClient.updateEmailAuthorized(accessToken,userUpdateEmail)
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
@@ -150,8 +153,9 @@ public class UserTest {
         accessToken = createResponse.extract().path("accessToken");
 
         String newName = user.getName() + "New";
+        UserUpdateName userUpdateName = new UserUpdateName(newName);
 
-        userClient.updateFieldAuthorized(accessToken, "name", newName)
+        userClient.updateNameAuthorized(accessToken, userUpdateName)
                 .assertThat()
                 .statusCode(SC_OK)
                 .and()
@@ -169,8 +173,9 @@ public class UserTest {
         accessToken = createResponse.extract().path("accessToken");
 
         String newEmail = user.getEmail() + "n";
+        UserUpdateEmail userUpdateEmail = new UserUpdateEmail(newEmail);
 
-        userClient.updateFieldUnauthorized("email", newEmail)
+        userClient.updateEmailUnauthorized(userUpdateEmail)
                 .assertThat()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
@@ -180,7 +185,7 @@ public class UserTest {
     }
 
     @Test
-    @DisplayName("Изменение почты пользователя без авторизации")
+    @DisplayName("Изменение имени пользователя без авторизации")
     public void userNameChangeWithoutAuthorizationFailed() {
         User user = UserGenerator.getRandom();
 
@@ -188,8 +193,9 @@ public class UserTest {
         accessToken = createResponse.extract().path("accessToken");
 
         String newName = user.getName() + "New";
+        UserUpdateName userUpdateName = new UserUpdateName(newName);
 
-        userClient.updateFieldUnauthorized("name", newName)
+        userClient.updateNameUnauthorized(userUpdateName)
                 .assertThat()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
@@ -208,8 +214,9 @@ public class UserTest {
         accessToken = createResponse.extract().path("accessToken");
         ValidatableResponse createResponse2 = userClient.create(user2);
         String accessToken2 = createResponse2.extract().path("accessToken");
+        UserUpdateEmail userUpdateEmail = new UserUpdateEmail(user2.getEmail());
 
-        ValidatableResponse emailUpdateResponce = userClient.updateFieldAuthorized(accessToken, "email", user2.getEmail());
+        ValidatableResponse emailUpdateResponce = userClient.updateEmailAuthorized(accessToken, userUpdateEmail);
         userClient.delete(accessToken2);
 
         emailUpdateResponce
